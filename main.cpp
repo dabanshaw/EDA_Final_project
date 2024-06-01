@@ -11,7 +11,7 @@ int main(int argc, char**argv) {
     // read_json(argv[3], argv[4]);
     vector<Block> res_blocks;
     vector<Connection_Matrix> res_connections;
-    tie(res_blocks, res_connections) = read(argv[1], argv[2], argv[3]);
+    tie(res_blocks, res_connections) = read(argv[2], argv[3], argv[4]);
 
     return 0;
 }
