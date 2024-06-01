@@ -38,4 +38,5 @@ struct Block {
     vector<Edge> through_block_edge_net_num;
     vector<Points> block_port_region;
     bool is_feedthroughable;
+    bool is_tile;
 };
