@@ -1,5 +1,5 @@
 # ifndef READ_DEF_H
-# define READ_DER_H
+# define READ_DEF_H
 # include <string>
 using namespace std;
 
