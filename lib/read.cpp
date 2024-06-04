@@ -54,9 +54,6 @@ tuple<vector<Block>, vector<Connection_Matrix>> read_json(string cfg_fpth, strin
         if (block["is_tile"] == "True"){
             temp_block.is_tile = true;}
         else{temp_block.is_tile = false;}
-        cout << temp_block.block_name << " " << temp_block.through_block_net_num << " " \
-        << temp_block.is_feedthroughable << " " << temp_block.is_tile << endl;
-        cout << "HI" <<endl;
         // 解析through_block_edge_net_num
         if (!block["through_block_edge_net_num"].empty()) {
             for (const auto& edge : block["through_block_edge_net_num"]) {
@@ -83,38 +80,18 @@ tuple<vector<Block>, vector<Connection_Matrix>> read_json(string cfg_fpth, strin
         // 将解析后的Block结构体添加到vector中
         blocks.push_back(temp_block);
     }
-    // cout<<"ENDDDDDDDDDd";
-    // file2.close();
-    //  data1 的輸出
-    for (const auto& item : connections) {
-        cout << "ID:" << item.ID << ", TX: " << item.TX << ", RX:";
-        for (const auto& rx : item.RX) {
-            cout << rx << " ";
-        }
-        cout << ", NUM:" << item.NUM << ", TX_COORD:[";
-        for (const auto& coord : item.TX_COORD) {
-            cout << coord << " ";
-        }
-        cout << "], RX_COORD:[";
-        for (const auto& coord : item.RX_COORD) {
-            cout << "[";
-            for (const auto& c : coord) {
-                cout << c << " ";
-            }
-            cout << "]";
-        }
-        cout << "]" << endl;
-    }
+    
 
     return make_tuple(blocks, connections);
 }
 
-vector<int> update_blk_coor(string def_fpth, vector<Block> &blks){
+tuple<vector<Point>, vector<Region>> read_def(string def_fpth, vector<Block> &blks){
+    /*output: vecter<Point> chip_layout, vector<Region> regions*/
     if (!fs::exists(def_fpth) || !fs::is_directory(def_fpth)){
         cout << "DEF path doesn't exist."<<endl;
         exit(0);
     }
-    // * Read blk.def files
+    // ! Read blk.def files
     for (const auto& entry : fs::directory_iterator(def_fpth)){
         if (entry.path().string().find("blk") == string::npos) continue;
         string fname = entry.path().stem().string();
@@ -143,19 +120,75 @@ vector<int> update_blk_coor(string def_fpth, vector<Block> &blks){
         }
         ifs.close();
     }
-
     
-    // for (int i=0; i<blks.size() ; i++){
-    //     cout << "blk_" <<i<< " ";
-    //     for (int j=0 ; j< blks[i].diearea.size(); ++j){
-    //         cout << "(" <<blks[i].diearea[j].x <<","<<blks[i].diearea[j].y<<")"<<"\t";
-    //     }
-    //     cout << endl;
-    // }
-
-
-    vector<int> chip_layout;
+    // ! Read chip_top.def 
+    vector<Point> chip_layout;
+    vector<Region> regions;
     ifstream ifs(def_fpth +"/chip_top.def");
+    string line, var;
+    istringstream iss;
+    Point tmp_pt;
+    int cnt=0;
+    // * Read chip size.
+    do{ 
+        getline(ifs, line);
+    }while(line.find("DIEAREA") ==string::npos);
+    iss.str(line); iss>>var;
+    while(iss >> var){
+        if (var == "(" || var == ")") continue;
+        if (var == ";") break;
+        if (!cnt){
+            tmp_pt.x = stoi(var);
+            ++cnt;
+        }else{
+            tmp_pt.y = stoi(var);
+            chip_layout.push_back(tmp_pt);
+            --cnt;
+        }
+    }
+    
+    // * Read block placement.
+    do{ 
+        getline(ifs, line);
+    }while(line.find("COMPONENTS") ==string::npos);
+    for (int i=0; i<blks.size(); ++i){
+        getline(ifs, line);
+        iss.str(line.substr(line.find("(")+2, -1)); iss.clear();
+        iss >> var; tmp_pt.x = stoi(var);
+        iss >> var; tmp_pt.y = stoi(var);
+        iss >> var; iss >>var;
+        blks[i].rotate(var, tmp_pt);
+    }
+    
+    // * Read Regions.
+    do{ getline(ifs, line);
+    }while(line.find("REGIONS") == string::npos);
+    iss.str(line); iss.clear();
+    iss >> var; iss >> var;
+    regions.resize(stoi(var));
+    
+    for (int i=0; i<regions.size(); ++i){
+        getline(ifs, line);
+        iss.str(line); iss.clear();
+        iss >> var; iss >> var;
+        string name(var);
+        vector<Point> pts;
+        cnt = 0;
+        while(iss >> var){
+            if (var == "(" || var == ")") continue;
+            if (var == ";") break;
+            if (!cnt){
+                tmp_pt.x = stoi(var);
+                ++cnt;
+            }else{
+                tmp_pt.y = stoi(var);
+                pts.push_back(tmp_pt);
+                --cnt;
+            }
+        }
+        regions[i] = Region(name, pts);
+    }
 
-    return chip_layout;
+    ifs.close();
+    return make_tuple(chip_layout, regions);
 }

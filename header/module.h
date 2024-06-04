@@ -44,10 +44,15 @@ struct Block {
     bool is_feedthroughable;
     bool is_tile;
     vector<Point> diearea;
+    void show_diearea();
+    void rotate(string ori, Point anchor);
 };
 
 struct Region{
+    string region_name;
     vector<Point> diearea;
+    Region(){};
+    Region(string name, vector<Point> pts):region_name(name), diearea(pts){};
 }; 
 
 # endif

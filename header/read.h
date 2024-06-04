@@ -9,6 +9,6 @@ using namespace std;
 
 tuple<vector<Block>, vector<Connection_Matrix>> read_json( string cfg_fpth, string net_fpth);
 
-vector<int> update_blk_coor(string def_fpth, vector<Block> &blks);
+tuple<vector<Point>, vector<Region>> read_def(string def_fpth, vector<Block> &blks);
 
 # endif
