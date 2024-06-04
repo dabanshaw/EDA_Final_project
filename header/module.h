@@ -21,6 +21,8 @@ struct Connection_Matrix {
 struct Point {
     int x;
     int y;
+    Point(){};
+    Point(int x, int y): x(x),y(y){};
 };
 
 struct Points{
@@ -41,6 +43,16 @@ struct Block {
     vector<Points> block_port_region;
     bool is_feedthroughable;
     bool is_tile;
+    vector<Point> diearea;
+    void show_diearea();
+    void rotate(string ori, Point anchor);
 };
+
+struct Region{
+    string region_name;
+    vector<Point> diearea;
+    Region(){};
+    Region(string name, vector<Point> pts):region_name(name), diearea(pts){};
+}; 
 
 # endif
