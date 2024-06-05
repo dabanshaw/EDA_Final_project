@@ -14,9 +14,8 @@ void Block::show_diearea(){
 }
 
 void Block::rotate(string ori, Point anchor){
-    cout << "***Before****" <<"|Orientation "<<ori<< " " << anchor.x << " " << anchor.y << endl;
-    show_diearea();
-
+    // cout << "***Before****" <<"|Orientation "<<ori<< " " << anchor.x << " " << anchor.y << endl;
+    // show_diearea();
     double rot_matrix[2][2] = {{1,0}, {0,1}};
     if (ori == "S"){ 
         rot_matrix[0][0] = -1;
