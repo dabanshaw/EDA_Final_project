@@ -46,6 +46,7 @@ struct Block {
     vector<Point> diearea;
     void show_diearea();
     void rotate(string ori, Point anchor);
+    vector<Point> edge_vertex;
 };
 
 struct Region{
