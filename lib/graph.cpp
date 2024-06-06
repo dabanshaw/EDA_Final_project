@@ -20,18 +20,8 @@ void determine_vertex(int tracks_per_um, int length, int width, vector<Connectio
     int grid_width = width;
     if (grid_length % 2000 != 0) grid_length = ((grid_length/2000) +1);
     if (grid_width % 2000 != 0) grid_width = ((grid_width/2000) +1);
-    // cout << "===============" << endl;
-    // cout << "length = " << grid_length  << " "<< " width = " << grid_width << endl;
-    // cout << "tracks_per_um = " << tracks_per_um << endl;
-    // cout << "max_num = " << max_num << " max_num_index = " << max_num_index << endl;
-    int cell_length = max_num/tracks_per_um;
-    if (cell_length %10 != 0) cell_length = ((cell_length / 10) + 1) * 10; 
-    // cout << "cell length = " << cell_length << endl;//一個cell是幾um
-
+    int cell_length = round(float(max_num/tracks_per_um));
     
-    cout << "========================" << endl;
-
-
     for (auto& block : blocks){
         vector<Point> temp_diearea = block.diearea;
         if (block.diearea.size() == 2){
@@ -40,22 +30,15 @@ void determine_vertex(int tracks_per_um, int length, int width, vector<Connectio
             min_y = temp_diearea[0].y;
             max_x = temp_diearea[1].x;
             max_y = temp_diearea[1].y;
-            // temp_diearea.clear();
-            // temp_diearea.push_back({Point{min_x, min_y}});
-            // temp_diearea.push_back({Point{max_x, min_y}});
-            // temp_diearea.push_back({Point{max_x, max_y}});
             temp_diearea.insert(temp_diearea.begin()+1, {Point{max_x, min_y}});
             temp_diearea.push_back({Point{min_x, max_y}});
         }
-        // cout << "block_name = " << block.block_name << endl;
         if (block.diearea.size() > 0){
             int temp_x = temp_diearea[0].x / 2000 / cell_length;
             int temp_y = temp_diearea[0].y / 2000 / cell_length;
             int ori_x = temp_diearea[0].x / 2000 / cell_length;
             int ori_y = temp_diearea[0].y / 2000 / cell_length;;
             int last_x, last_y;
-            cout << block.block_name << endl;
-            // cout << "temp_xy " << temp_x << " " << temp_y << endl;
             for (auto& vertex : temp_diearea){
                 vertex.x = vertex.x / 2000 /cell_length;
                 vertex.y = vertex.y / 2000 /cell_length;
@@ -89,8 +72,6 @@ void determine_vertex(int tracks_per_um, int length, int width, vector<Connectio
                 last_x = vertex.x;
                 last_y = vertex.y;          
             }
-            // cout << "last " << last_x << " " << last_y << endl;
-            // cout << "Ori " << ori_x << " " << ori_y << endl;
             if (last_x == ori_x){
                 if (last_y < ori_y){
                     for (int i = last_y; i < ori_y; i++){
@@ -115,16 +96,7 @@ void determine_vertex(int tracks_per_um, int length, int width, vector<Connectio
                     }
                 }
             }
-            // block.edge_vertex.push_back({Point{last_x, last_y}});
-        }
-        // cout << "===============" << endl;
-    }
-    for (auto& block : blocks){
-        if (block.block_name == "BLOCK_0"){
-            // cout << "block_name = " << block.block_name << endl;
-            for (auto& vertex : block.edge_vertex){
-                // cout << vertex.x << " " << vertex.y << endl;
-            }
         }
     }
+    
 }
