@@ -26,7 +26,7 @@ int main(int argc, char**argv) {
         }
     }
 
-    res_blocks = build_graph(atoi(argv[1]), chip_layout[1].x, chip_layout[1].y, res_connections, res_blocks);
+    determine_vertex(atoi(argv[1]), chip_layout[1].x, chip_layout[1].y, res_connections, res_blocks);
     
     return 0;
 }

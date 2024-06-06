@@ -10,6 +10,6 @@
 using namespace std;
 // using json = nlohmann::json;
 
-vector<Block> build_graph(int tracks_per_um, int length, int width, vector<Connection_Matrix> connections, vector<Block> block);
+void determine_vertex(int tracks_per_um, int length, int width, vector<Connection_Matrix> &connections, vector<Block> &blocks);
 
 # endif

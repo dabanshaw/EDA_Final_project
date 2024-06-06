@@ -7,8 +7,7 @@
 
 using namespace std;
 using json = nlohmann::json;
-
-vector<Block> build_graph(int tracks_per_um, int length, int width, vector<Connection_Matrix> connections, vector<Block> blocks){
+void determine_vertex(int tracks_per_um, int length, int width, vector<Connection_Matrix> &connections, vector<Block> &blocks){
     int max_num = 0;
     int max_num_index = 0;
     for (const auto& connection : connections){
@@ -31,40 +30,36 @@ vector<Block> build_graph(int tracks_per_um, int length, int width, vector<Conne
 
     
     cout << "========================" << endl;
+
+
     for (auto& block : blocks){
-        int min_x, min_y, max_x, max_y;
+        vector<Point> temp_diearea = block.diearea;
         if (block.diearea.size() == 2){
-            min_x = block.diearea[0].x;
-            min_y = block.diearea[0].y;
-            max_x = block.diearea[1].x;
-            max_x = block.diearea[1].y;
-            // cout << "first " << block.diearea[0].x << " " << block.diearea[0].y << endl;
-            // cout << "second" << block.diearea[1].x << " " << block.diearea[1].y << endl;
-            block.diearea.clear();
-            block.diearea.push_back({Point{min_x, min_y}});
-            block.diearea.push_back({Point{max_x, min_y}});
-            block.diearea.push_back({Point{max_x, max_y}});
-            block.diearea.push_back({Point{min_x, max_y}});
+            int min_x, min_y, max_x, max_y;
+            min_x = temp_diearea[0].x;
+            min_y = temp_diearea[0].y;
+            max_x = temp_diearea[1].x;
+            max_y = temp_diearea[1].y;
+            // temp_diearea.clear();
+            // temp_diearea.push_back({Point{min_x, min_y}});
+            // temp_diearea.push_back({Point{max_x, min_y}});
+            // temp_diearea.push_back({Point{max_x, max_y}});
+            temp_diearea.insert(temp_diearea.begin()+1, {Point{max_x, min_y}});
+            temp_diearea.push_back({Point{min_x, max_y}});
         }
-    }
-
-    for (auto& block : blocks){
-        cout << "block_name = " << block.block_name << endl;
+        // cout << "block_name = " << block.block_name << endl;
         if (block.diearea.size() > 0){
-            int temp_x = block.diearea[0].x / 2000 / cell_length;
-            int temp_y = block.diearea[0].y / 2000 / cell_length;
-            int ori_x = block.diearea[0].x / 2000 / cell_length;
-            int ori_y = block.diearea[0].y / 2000 / cell_length;;
+            int temp_x = temp_diearea[0].x / 2000 / cell_length;
+            int temp_y = temp_diearea[0].y / 2000 / cell_length;
+            int ori_x = temp_diearea[0].x / 2000 / cell_length;
+            int ori_y = temp_diearea[0].y / 2000 / cell_length;;
             int last_x, last_y;
+            cout << block.block_name << endl;
             // cout << "temp_xy " << temp_x << " " << temp_y << endl;
-            for (auto& vertex : block.diearea){
-                vertex.x = vertex.x / 2000;
-                vertex.y = vertex.y / 2000;
-                vertex.x = vertex.x / cell_length;
-                vertex.y = vertex.y / cell_length;
-                cout << vertex.x << " " << vertex.y << endl; 
-                // cout << "temp: " << temp_x << " " << temp_y << endl;
-
+            for (auto& vertex : temp_diearea){
+                vertex.x = vertex.x / 2000 /cell_length;
+                vertex.y = vertex.y / 2000 /cell_length;
+                cout << vertex.x << " " << vertex.y << endl;
                 if (temp_x == vertex.x){
                     if (temp_y < vertex.y){
                         for(int i=temp_y; i < vertex.y; i++){
@@ -126,13 +121,10 @@ vector<Block> build_graph(int tracks_per_um, int length, int width, vector<Conne
     }
     for (auto& block : blocks){
         if (block.block_name == "BLOCK_0"){
-            cout << "block_name = " << block.block_name << endl;
+            // cout << "block_name = " << block.block_name << endl;
             for (auto& vertex : block.edge_vertex){
                 // cout << vertex.x << " " << vertex.y << endl;
             }
         }
     }
-    return blocks;
-
-    // return make_tuple(max_num, max_num_index);
 }
