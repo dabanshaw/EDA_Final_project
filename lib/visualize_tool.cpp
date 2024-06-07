@@ -42,7 +42,10 @@ void draw_block(string fpth, vector<Point> chip_layout, vector<Block> &blks, vec
             int x2 = blk.diearea[1].x , y2 = blk.diearea[1].y;
             ofs << "set object "<< i << " rect from ";
             ofs << x1 << "," << y1;
-            ofs << " to "<< x2 << "," << y2<<endl;
+            ofs << " to "<< x2 << "," << y2;
+            if (!blk.is_feedthroughable) ofs << " fc rgb \"red\"";
+            else ofs << " fc rgb \"green\"";
+            ofs << endl;
             ofs << "set label \""<< blk.block_name << "\" at ";
             ofs << int((x1+x2)/2) << "," << int((y1+y2)/2) <<" center" <<endl;
         }else if(blk.diearea.size() >0){
@@ -52,7 +55,9 @@ void draw_block(string fpth, vector<Point> chip_layout, vector<Block> &blks, vec
             max_y = min_y = blk.diearea[0].y;
 
             for (int j=1 ; j< blk.diearea.size() ; ++j){
+
                 string last_str = (j != blk.diearea.size()-1)?" \\" :" fc rgb \"red\"";
+                
                 ofs << " to " << blk.diearea[j].x << "," << blk.diearea[j].y;
                 sum_x += blk.diearea[j].x; sum_y += blk.diearea[j].y;
                 if (blk.diearea[j].x > max_x) max_x = blk.diearea[j].x;
@@ -62,7 +67,10 @@ void draw_block(string fpth, vector<Point> chip_layout, vector<Block> &blks, vec
                 else if (blk.diearea[j].y < min_y) min_y = blk.diearea[j].y;
             }
             ofs << " to " << blk.diearea[0].x <<"," << blk.diearea[0].y;
-            ofs << " fc rgb \"red\"" << endl;
+            if (!blk.is_feedthroughable) ofs << " fc rgb \"red\"";
+            else ofs << " fc rgb \"green\"";
+            ofs << endl;
+            
             ofs << "set label \""<< blk.block_name << "\" at ";
             ofs << int((max_x + min_x)/2) << "," << int((max_y+min_y)/2) << " center" << endl;
         }
